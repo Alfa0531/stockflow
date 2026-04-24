@@ -25,7 +25,7 @@ git --version
 ### 1. Clonar el repositorio
 
 ```bash
-git clone https://github.com/amoxtlitech/stockflow.git
+git clone https://github.com/Alfa0531/stockflow.git
 cd stockflow
 ```
 
@@ -37,25 +37,44 @@ npm install
 
 ### 3. Crear el archivo de configuración `.env`
 
-Crea un archivo llamado `.env` en la raíz del proyecto con el siguiente contenido.  
-**Importante:** reemplaza la ruta con la ruta absoluta donde clonaste el proyecto en tu computadora.
+Este archivo le dice a la app dónde guardar la base de datos. Sigue estos pasos según tu sistema operativo:
 
-**Mac / Linux:**
-```env
-DATABASE_URL="file:/ruta/completa/a/tu/carpeta/stockflow/prisma/dev.db"
-```
+#### En Mac
 
-Por ejemplo, si clonaste en tu carpeta de Documentos:
-```env
-DATABASE_URL="file:/Users/tu-nombre/Documents/stockflow/prisma/dev.db"
-```
+1. Abre la terminal y escribe este comando para saber tu ruta exacta (cópiala, la necesitas en el siguiente paso):
+   ```bash
+   pwd
+   ```
+   Verás algo como: `/Users/maria/Documents/stockflow`
 
-**Windows:**
-```env
-DATABASE_URL="file:C:/Users/tu-nombre/Documents/stockflow/prisma/dev.db"
-```
+2. Abre el **TextEdit**, ve al menú **Formato → Convertir a formato sin estilo**
 
-> Para saber tu ruta exacta: en la terminal, dentro de la carpeta `stockflow`, ejecuta `pwd` (Mac/Linux) o `cd` (Windows).
+3. Pega el siguiente texto, reemplazando la ruta con la que obtuviste en el paso 1:
+   ```
+   DATABASE_URL="file:/Users/maria/Documents/stockflow/prisma/dev.db"
+   ```
+
+4. Ve a **Archivo → Guardar**, navega a la carpeta `stockflow`, escribe `.env` como nombre del archivo y guarda.  
+   Si el sistema te advierte que los archivos que empiezan con punto están ocultos, haz clic en **Usar .env**.
+
+#### En Windows
+
+1. Abre la terminal (CMD o PowerShell) y escribe este comando para saber tu ruta exacta:
+   ```bash
+   cd
+   ```
+   Verás algo como: `C:\Users\maria\Documents\stockflow`
+
+2. Abre el **Bloc de notas**
+
+3. Pega el siguiente texto, reemplazando la ruta con la que obtuviste en el paso 1 (usa `/` en lugar de `\`):
+   ```
+   DATABASE_URL="file:C:/Users/maria/Documents/stockflow/prisma/dev.db"
+   ```
+
+4. Ve a **Archivo → Guardar como**, navega a la carpeta `stockflow`, escribe `.env` como nombre del archivo, cambia "Tipo" a **Todos los archivos (\*.\*)** y guarda.
+
+> **Verificación:** Si lo hiciste bien, dentro de la carpeta `stockflow` verás un archivo llamado `.env` (puede aparecer oculto en Mac, es normal).
 
 ### 4. Crear la base de datos
 
