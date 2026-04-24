@@ -1,0 +1,199 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Warehouse {
+  id        String   @id @default(cuid())
+  name      String
+  code      String   @unique
+  address   String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products  Product[]
+  movements InventoryMovement[]
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+
+  products Product[]
+}
+
+model Supplier {
+  id           String   @id @default(cuid())
+  name         String
+  code         String   @unique
+  email        String?
+  phone        String?
+  contact      String?
+  paymentTerms Int      @default(30)
+  leadTime     Int      @default(7)
+  active       Boolean  @default(true)
+  rating       Float    @default(5.0)
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  products Product[]
+  orders   PurchaseOrder[]
+}
+
+model Product {
+  id          String  @id @default(cuid())
+  warehouseId String
+  categoryId  String?
+  supplierId  String?
+
+  sku          String  @unique
+  internalCode String?
+  name         String
+  description  String?
+  brand        String?
+  unit         String  @default("PZA")
+  barcode      String?
+
+  cost  Float
+  price Float
+
+  stockCurrent Float @default(0)
+  stockMin     Float @default(0)
+  stockMax     Float @default(0)
+  stockSafety  Float @default(0)
+
+  leadTime     Int    @default(7)
+  reorderPoint Float?
+  eoq          Float?
+
+  location String?
+  active   Boolean       @default(true)
+  status   ProductStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  warehouse  Warehouse           @relation(fields: [warehouseId], references: [id])
+  category   Category?           @relation(fields: [categoryId], references: [id])
+  supplier   Supplier?           @relation(fields: [supplierId], references: [id])
+  movements  InventoryMovement[]
+  orderItems PurchaseOrderItem[]
+  alerts     Alert[]
+}
+
+model InventoryMovement {
+  id          String       @id @default(cuid())
+  productId   String
+  warehouseId String
+  type        MovementType
+  quantity    Float
+  unitCost    Float?
+  stockBefore Float
+  stockAfter  Float
+  reference   String?
+  lot         String?
+  notes       String?
+  createdAt   DateTime     @default(now())
+
+  product   Product   @relation(fields: [productId], references: [id])
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id])
+}
+
+model PurchaseOrder {
+  id           String      @id @default(cuid())
+  supplierId   String
+  orderNumber  String      @unique
+  status       OrderStatus @default(DRAFT)
+  issuedDate   DateTime?
+  expectedDate DateTime?
+  receivedDate DateTime?
+  subtotal     Float       @default(0)
+  tax          Float       @default(0)
+  total        Float       @default(0)
+  notes        String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  supplier Supplier            @relation(fields: [supplierId], references: [id])
+  items    PurchaseOrderItem[]
+}
+
+model PurchaseOrderItem {
+  id               String  @id @default(cuid())
+  orderId          String
+  productId        String
+  quantity         Float
+  unitCost         Float
+  total            Float
+  quantityReceived Float   @default(0)
+
+  order   PurchaseOrder @relation(fields: [orderId], references: [id])
+  product Product       @relation(fields: [productId], references: [id])
+}
+
+model Alert {
+  id        String     @id @default(cuid())
+  productId String?
+  type      AlertType
+  level     AlertLevel
+  title     String
+  message   String
+  resolved  Boolean    @default(false)
+  createdAt DateTime   @default(now())
+
+  product Product? @relation(fields: [productId], references: [id])
+}
+
+enum ProductStatus {
+  ACTIVE
+  SLOW_MOVING
+  DEAD
+  OUT_OF_STOCK
+  DISCONTINUED
+}
+
+enum MovementType {
+  PURCHASE_IN
+  SALE_OUT
+  ADJUSTMENT_IN
+  ADJUSTMENT_OUT
+  RETURN_IN
+  RETURN_OUT
+  SHRINKAGE
+  TRANSFER_IN
+  TRANSFER_OUT
+  INITIAL
+}
+
+enum OrderStatus {
+  DRAFT
+  SENT
+  CONFIRMED
+  PARTIAL
+  RECEIVED
+  CANCELLED
+}
+
+enum AlertType {
+  LOW_STOCK
+  OUT_OF_STOCK
+  EXCESS_STOCK
+  DEAD_PRODUCT
+  REORDER_POINT
+}
+
+enum AlertLevel {
+  GREEN
+  YELLOW
+  RED
+  BLACK
+}
